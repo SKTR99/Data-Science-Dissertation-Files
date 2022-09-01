@@ -1,0 +1,36 @@
+install.packages("caret")
+install.packages('rlang') 
+install.packages("fastDummies")
+library(caret)
+library('fastDummies')
+library(klaR)
+
+#Load data 
+reg = read.csv('logdata.csv')
+
+#Create dummy variables for FYEAR, SIC and GVKEY and remove original columns
+reg = dummy_cols(reg, select_columns = c('FYEAR', 'SIC', 'GVKEY'),
+remove_selected_columns = TRUE)
+
+#Seed ensures reproducibility 
+set.seed(97)
+
+#Create 80/20 split 
+
+sample_size <- floor(0.80 * nrow(reg))
+
+train_spl <- sample(seq_len(nrow(reg)), size = sample_size)
+
+#Creating training and testing data 
+train <- reg[train_spl, ]
+test <- reg[-train_spl, ]
+
+#Training logistic model 
+reg_logit = glm(CRASH ~., family = binomial(), data=train)
+
+#Finding coefficients 
+summary(reg_logit)
+
+
+
+
